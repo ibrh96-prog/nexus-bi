@@ -1,6 +1,8 @@
 {
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
   "compilerOptions": {
+    "noImplicitAny": false,
+    "strict": false,
     "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",

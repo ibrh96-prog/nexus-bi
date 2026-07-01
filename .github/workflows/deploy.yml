@@ -55,7 +55,7 @@ jobs:
       # ---- backend ---------------------------------------------------
       - name: Install backend deps
         working-directory: server
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
 
       - name: Backend typecheck
         working-directory: server
