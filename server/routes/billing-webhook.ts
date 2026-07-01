@@ -44,9 +44,7 @@ router.post("/", webhookRawParser, async (req: Request, res: Response) => {
             ? await userIdForStripeCustomer(session.customer)
             : null);
         if (!userId || !session.subscription) break;
-        const subscription = await stripe.subscriptions.retrieve(
-          session.subscription as string,
-        );
+        const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
         await upsertSubscriptionFromStripe(userId, subscription);
         break;
       }
@@ -56,9 +54,7 @@ router.post("/", webhookRawParser, async (req: Request, res: Response) => {
         if (!invoice.subscription || typeof invoice.customer !== "string") break;
         const userId = await userIdForStripeCustomer(invoice.customer);
         if (!userId) break;
-        const subscription = await stripe.subscriptions.retrieve(
-          invoice.subscription as string,
-        );
+        const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
         await upsertSubscriptionFromStripe(userId, subscription);
         break;
       }

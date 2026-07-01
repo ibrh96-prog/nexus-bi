@@ -172,9 +172,7 @@ export async function reportAiTokenUsage(params: {
 }
 
 /** Look up the userId that owns a Stripe customer. */
-export async function userIdForStripeCustomer(
-  stripeCustomerId: string,
-): Promise<string | null> {
+export async function userIdForStripeCustomer(stripeCustomerId: string): Promise<string | null> {
   const [row] = await db
     .select({ userId: billingCustomers.userId })
     .from(billingCustomers)

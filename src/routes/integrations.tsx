@@ -14,23 +14,42 @@ export const Route = createFileRoute("/integrations")({
   head: () => ({
     meta: [
       { title: "Integration Hub — Nexus BI" },
-      { name: "description", content: "Manage third-party integrations, sync status, and event throughput." },
+      {
+        name: "description",
+        content: "Manage third-party integrations, sync status, and event throughput.",
+      },
     ],
   }),
   component: IntegrationsPage,
 });
 
-const statusMeta: Record<IntegrationStatus, { label: string; className: string; icon: React.ComponentType<{ className?: string }> }> = {
-  connected: { label: "Connected", className: "bg-success/10 text-success border-success/20", icon: CheckCircle2 },
+const statusMeta: Record<
+  IntegrationStatus,
+  { label: string; className: string; icon: React.ComponentType<{ className?: string }> }
+> = {
+  connected: {
+    label: "Connected",
+    className: "bg-success/10 text-success border-success/20",
+    icon: CheckCircle2,
+  },
   syncing: { label: "Syncing", className: "bg-info/10 text-info border-info/20", icon: RefreshCw },
-  error: { label: "Error", className: "bg-destructive/10 text-destructive border-destructive/20", icon: AlertCircle },
+  error: {
+    label: "Error",
+    className: "bg-destructive/10 text-destructive border-destructive/20",
+    icon: AlertCircle,
+  },
 };
 
 function StatusBadge({ status }: { status: IntegrationStatus }) {
   const m = statusMeta[status];
   const Icon = m.icon;
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium", m.className)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium",
+        m.className,
+      )}
+    >
       <Icon className={cn("h-3 w-3", status === "syncing" && "animate-spin")} />
       {m.label}
     </span>
@@ -83,7 +102,9 @@ function IntegrationsPage() {
                 onClick={() => setView(v)}
                 className={cn(
                   "rounded px-3 py-1 text-xs font-medium capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  view === v ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground",
+                  view === v
+                    ? "bg-accent text-accent-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {v}
@@ -133,7 +154,9 @@ function IntegrationsPage() {
                   </div>
                   <div>
                     <div className="text-muted-foreground">Events</div>
-                    <div className="mt-0.5 font-medium tabular-nums text-foreground">{it.events}</div>
+                    <div className="mt-0.5 font-medium tabular-nums text-foreground">
+                      {it.events}
+                    </div>
                   </div>
                 </div>
               </article>
@@ -164,7 +187,9 @@ function IntegrationsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{it.category}</td>
-                    <td className="px-4 py-3"><StatusBadge status={it.status} /></td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={it.status} />
+                    </td>
                     <td className="px-4 py-3 tabular-nums text-muted-foreground">{it.sync}</td>
                     <td className="px-4 py-3 tabular-nums">{it.events}</td>
                     <td className="px-4 py-3">
@@ -184,18 +209,28 @@ function IntegrationsPage() {
   );
 }
 
-function StatCard({ label, value, tone }: { label: string; value: string; tone?: "success" | "info" | "destructive" }) {
+function StatCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone?: "success" | "info" | "destructive";
+}) {
   const toneClass =
     tone === "success"
       ? "text-success"
       : tone === "info"
-      ? "text-info"
-      : tone === "destructive"
-      ? "text-destructive"
-      : "text-foreground";
+        ? "text-info"
+        : tone === "destructive"
+          ? "text-destructive"
+          : "text-foreground";
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
       <div className={cn("mt-1 text-2xl font-semibold tabular-nums", toneClass)}>{value}</div>
     </div>
   );

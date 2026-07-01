@@ -7,7 +7,6 @@ import { initObservability } from "./lib/observability";
 // No-op during SSR (window guard) and when env vars are missing.
 initObservability();
 
-
 export const getRouter = () => {
   const queryClient = new QueryClient();
 

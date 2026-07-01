@@ -47,8 +47,14 @@ export const usePresenceStore = create<PresenceState>((set) => ({
 
 /* Deterministic color per userId so the same user always gets the same swatch. */
 const CURSOR_PALETTE = [
-  "#ef4444", "#f97316", "#eab308", "#22c55e",
-  "#14b8a6", "#3b82f6", "#8b5cf6", "#ec4899",
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#14b8a6",
+  "#3b82f6",
+  "#8b5cf6",
+  "#ec4899",
 ];
 export function colorForUser(userId: string): string {
   let hash = 0;

@@ -10,7 +10,6 @@ import { cacheInvalidatePrefix, METRICS_CACHE_PREFIX } from "../cache";
 
 const router = Router();
 
-
 const createSchema = z.object({
   revenue: z.number().finite().nonnegative(),
   activeWorkflows: z.number().int().nonnegative(),
@@ -40,11 +39,7 @@ router.get(
   cacheMetrics,
   wrap(async (req, res) => {
     const limit = Math.min(Number(req.query.limit ?? 100) || 100, 500);
-    const rows = await db
-      .select()
-      .from(metrics)
-      .orderBy(desc(metrics.recordedAt))
-      .limit(limit);
+    const rows = await db.select().from(metrics).orderBy(desc(metrics.recordedAt)).limit(limit);
     res.json(rows.map(toNumeric));
   }),
 );
@@ -127,10 +122,7 @@ router.delete(
   wrap(async (req, res) => {
     const { id } = idParam.parse(req.params);
     const [before] = await db.select().from(metrics).where(eq(metrics.id, id));
-    const [row] = await db
-      .delete(metrics)
-      .where(eq(metrics.id, id))
-      .returning({ id: metrics.id });
+    const [row] = await db.delete(metrics).where(eq(metrics.id, id)).returning({ id: metrics.id });
     if (!row) return res.status(404).json({ error: "Metric not found" });
     await auditFromRequest(req, {
       action: "delete",
@@ -142,6 +134,5 @@ router.delete(
     res.status(204).end();
   }),
 );
-
 
 export default router;

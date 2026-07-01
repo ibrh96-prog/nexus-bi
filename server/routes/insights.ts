@@ -76,11 +76,7 @@ router.put(
     if (Object.keys(patch).length === 0) {
       return res.status(400).json({ error: "No fields to update" });
     }
-    const [row] = await db
-      .update(aiInsights)
-      .set(patch)
-      .where(eq(aiInsights.id, id))
-      .returning();
+    const [row] = await db.update(aiInsights).set(patch).where(eq(aiInsights.id, id)).returning();
     if (!row) return res.status(404).json({ error: "Insight not found" });
     res.json(row);
   }),

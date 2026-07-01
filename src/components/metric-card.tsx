@@ -13,7 +13,7 @@ export function MetricCard({ label, value, change, trend, hint }: MetricCardProp
   const positive = (trend === "up" && change >= 0) || (trend === "down" && change < 0);
   // For metrics like churn/resolution, "down" is good.
   const goodDirection =
-    (label.toLowerCase().includes("churn") || label.toLowerCase().includes("resolution"))
+    label.toLowerCase().includes("churn") || label.toLowerCase().includes("resolution")
       ? change < 0
       : change >= 0;
 
@@ -31,9 +31,7 @@ export function MetricCard({ label, value, change, trend, hint }: MetricCardProp
         <div
           className={cn(
             "inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold tabular-nums",
-            goodDirection
-              ? "bg-success/10 text-success"
-              : "bg-destructive/10 text-destructive",
+            goodDirection ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
           )}
         >
           {change >= 0 ? (

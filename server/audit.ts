@@ -70,10 +70,7 @@ export async function recordAudit(params: AuditParams): Promise<void> {
 }
 
 /** Convenience: derive the actor id from `req.user` set by `authenticate`. */
-export function auditFromRequest(
-  req: Request,
-  params: Omit<AuditParams, "userId">,
-): Promise<void> {
+export function auditFromRequest(req: Request, params: Omit<AuditParams, "userId">): Promise<void> {
   return recordAudit({ ...params, userId: req.user?.id ?? null });
 }
 
@@ -91,7 +88,9 @@ export async function verifyAuditChain(): Promise<{ ok: boolean; brokenAt?: stri
       payload: r.payload,
       timestamp: r.timestamp.toISOString(),
     };
-    const hash = createHash("sha256").update(r.prevHash + canonicalize(body)).digest("hex");
+    const hash = createHash("sha256")
+      .update(r.prevHash + canonicalize(body))
+      .digest("hex");
     if (hash !== r.rowHash) return { ok: false, brokenAt: r.id };
     expectedPrev = r.rowHash;
   }

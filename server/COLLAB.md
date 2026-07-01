@@ -24,13 +24,16 @@ const { emitCursor } = useCollab({
   user: { userId: currentUser.id, name: currentUser.name },
 });
 
-<div ref={canvasRef} onPointerMove={(e) => {
-  const r = canvasRef.current!.getBoundingClientRect();
-  emitCursor(e.clientX - r.left, e.clientY - r.top);
-}}>
+<div
+  ref={canvasRef}
+  onPointerMove={(e) => {
+    const r = canvasRef.current!.getBoundingClientRect();
+    emitCursor(e.clientX - r.left, e.clientY - r.top);
+  }}
+>
   <CollabCursors />
   {/* nodes / edges */}
-</div>
+</div>;
 ```
 
 Concurrency notes:

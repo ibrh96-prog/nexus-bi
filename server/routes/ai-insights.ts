@@ -45,8 +45,8 @@ function buildSystemPrompt() {
     "- Recommendations must be practical operational actions a business team can take this week.",
     "- Keep each `message` under 240 characters.",
     "",
-    'Return ONLY valid JSON matching exactly this shape (no markdown, no prose):',
-    '{',
+    "Return ONLY valid JSON matching exactly this shape (no markdown, no prose):",
+    "{",
     '  "anomalies":       [{ "type": "anomaly",        "message": string, "severity": "low"|"medium"|"high", "metric": string }],',
     '  "recommendations": [{ "type": "recommendation", "message": string, "severity": "low"|"medium"|"high", "metric": string }],',
     '  "summary": string',
@@ -144,7 +144,10 @@ async function callAnthropic(system: string, user: string, apiKey: string): Prom
 }
 
 class UpstreamError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
     super(message);
   }
 }
@@ -170,23 +173,15 @@ router.post(
   wrap(async (_req, res) => {
     const apiKey = process.env.AI_API_KEY;
     if (!apiKey) {
-      return res
-        .status(500)
-        .json({ error: "AI_API_KEY is not configured on the server" });
+      return res.status(500).json({ error: "AI_API_KEY is not configured on the server" });
     }
 
     // 1. Load latest metrics + recent history for context.
-    const history = await db
-      .select()
-      .from(metrics)
-      .orderBy(desc(metrics.recordedAt))
-      .limit(20);
+    const history = await db.select().from(metrics).orderBy(desc(metrics.recordedAt)).limit(20);
 
     const [latest] = history;
     if (!latest) {
-      return res
-        .status(404)
-        .json({ error: "No metrics available to analyze" });
+      return res.status(404).json({ error: "No metrics available to analyze" });
     }
 
     // 2. Build prompts and call the selected model.
@@ -235,13 +230,10 @@ router.post(
       })),
     ];
 
-    const inserted = rows.length
-      ? await db.insert(aiInsights).values(rows).returning()
-      : [];
+    const inserted = rows.length ? await db.insert(aiInsights).values(rows).returning() : [];
 
     // New insights generated — bust cached dashboard reads.
     if (inserted.length) await invalidateDashboardCaches();
-
 
     // 5. Return structured JSON to the client.
     return res.status(201).json({

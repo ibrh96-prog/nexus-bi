@@ -73,7 +73,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             onClick={() => setCollapsed((c) => !c)}
             className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <ChevronsLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
+            <ChevronsLeft
+              className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")}
+            />
             {!collapsed && <span>Collapse</span>}
           </button>
         </div>

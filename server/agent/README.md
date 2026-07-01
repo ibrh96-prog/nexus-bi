@@ -9,7 +9,7 @@ the `ai_insights` table.
   - `createSupportTicket(issueDetails)`
   - `escalateToHuman(reason)`
   - `updateWorkflowNodeData(nodeId, newParams)`
-  Each tool writes to the `agent_actions` audit table.
+    Each tool writes to the `agent_actions` audit table.
 - `agent.ts` — builds a `ChatOpenAI` (`gpt-4o` by default) + `createAgent`
   loop with a severity-aware system prompt.
 - `watcher.ts` — `node-cron` job that polls `ai_insights` every minute for
@@ -18,12 +18,12 @@ the `ai_insights` table.
 
 ## Environment
 
-| Var | Purpose | Default |
-| --- | --- | --- |
-| `OPENAI_API_KEY` | model auth | required |
-| `OPENAI_MODEL` | override model | `gpt-4o` |
-| `AGENT_WATCHER_CRON` | poll schedule | `*/1 * * * *` |
-| `AGENT_WATCHER_ENABLED` | set to `false` to disable | `true` |
+| Var                     | Purpose                   | Default       |
+| ----------------------- | ------------------------- | ------------- |
+| `OPENAI_API_KEY`        | model auth                | required      |
+| `OPENAI_MODEL`          | override model            | `gpt-4o`      |
+| `AGENT_WATCHER_CRON`    | poll schedule             | `*/1 * * * *` |
+| `AGENT_WATCHER_ENABLED` | set to `false` to disable | `true`        |
 
 ## Schema additions
 

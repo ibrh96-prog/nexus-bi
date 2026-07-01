@@ -1,10 +1,6 @@
 import { useEffect, useRef } from "react";
 import { COLLAB_EVENTS, getCollabSocket } from "@/lib/collab-socket";
-import {
-  usePresenceStore,
-  colorForUser,
-  type RemoteCursor,
-} from "@/stores/presence-store";
+import { usePresenceStore, colorForUser, type RemoteCursor } from "@/stores/presence-store";
 import { useWorkflowStore, type WorkflowEdge, type NodePosition } from "@/stores/workflow-store";
 
 interface UseCollabOptions {
@@ -49,8 +45,7 @@ export function useCollab({ workflowId, user, cursorThrottleMs = 40 }: UseCollab
     const onJoin = (p: { userId: string; name: string; color: string }) => upsertPeer(p);
     const onLeave = (p: { userId: string }) => removePeer(p.userId);
 
-    const onCursor = (c: RemoteCursor) =>
-      setCursor({ ...c, updatedAt: Date.now() });
+    const onCursor = (c: RemoteCursor) => setCursor({ ...c, updatedAt: Date.now() });
 
     const onNodeUpdate = (p: {
       nodeId: string;

@@ -30,14 +30,23 @@ export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Command Center — Nexus BI" },
-      { name: "description", content: "Executive command center with revenue trajectories, operational capacity, and resource distribution." },
+      {
+        name: "description",
+        content:
+          "Executive command center with revenue trajectories, operational capacity, and resource distribution.",
+      },
     ],
   }),
   component: Dashboard,
 });
 
 const currency = (v: number) =>
-  new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1, style: "currency", currency: "USD" }).format(v);
+  new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+    style: "currency",
+    currency: "USD",
+  }).format(v);
 const number = (v: number) => new Intl.NumberFormat("en-US").format(Math.round(v));
 
 // ---------- Time range ----------
@@ -58,7 +67,12 @@ function seeded(i: number, salt = 1) {
 function buildRevenue(range: RangeKey) {
   const cfg = RANGES.find((r) => r.key === range)!;
   if (cfg.step === "month") {
-    return revenueSeries.map((r) => ({ label: r.month, revenue: r.revenue, forecast: r.forecast, automated: r.automated }));
+    return revenueSeries.map((r) => ({
+      label: r.month,
+      revenue: r.revenue,
+      forecast: r.forecast,
+      automated: r.automated,
+    }));
   }
   const now = new Date();
   const points = cfg.points;
@@ -76,9 +90,10 @@ function buildRevenue(range: RangeKey) {
     const revenue = Math.round(base * noise * growth);
     const forecast = Math.round(base * (0.92 + seeded(i, 7) * 0.16) * growth);
     const automated = Math.round(revenue * (autoRatio * (0.9 + seeded(i, 11) * 0.2)));
-    const label = cfg.step === "day"
-      ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-      : `W${Math.ceil((d.getDate()) / 7)} ${d.toLocaleDateString("en-US", { month: "short" })}`;
+    const label =
+      cfg.step === "day"
+        ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : `W${Math.ceil(d.getDate() / 7)} ${d.toLocaleDateString("en-US", { month: "short" })}`;
     out.push({ label, revenue, forecast, automated });
   }
   return out;
@@ -97,11 +112,12 @@ function buildRuns(range: RangeKey) {
     else d.setMonth(d.getMonth() - i);
     const runs = Math.round(base * (0.8 + seeded(i, 19) * 0.5) + i * 6);
     const failures = Math.round(runs * (0.01 + seeded(i, 23) * 0.03));
-    const label = cfg.step === "month"
-      ? d.toLocaleDateString("en-US", { month: "short" })
-      : cfg.step === "week"
-        ? `W${Math.ceil(d.getDate() / 7)} ${d.toLocaleDateString("en-US", { month: "short" })}`
-        : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const label =
+      cfg.step === "month"
+        ? d.toLocaleDateString("en-US", { month: "short" })
+        : cfg.step === "week"
+          ? `W${Math.ceil(d.getDate() / 7)} ${d.toLocaleDateString("en-US", { month: "short" })}`
+          : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     out.push({ label, runs, failures });
   }
   return out;
@@ -147,7 +163,11 @@ function CustomTooltip({ active, label, payload, format = number, hint }: Custom
           </li>
         ))}
       </ul>
-      {hint && <div className="mt-2 border-t border-border pt-1.5 text-[11px] text-muted-foreground">{hint}</div>}
+      {hint && (
+        <div className="mt-2 border-t border-border pt-1.5 text-[11px] text-muted-foreground">
+          {hint}
+        </div>
+      )}
     </div>
   );
 }
@@ -261,7 +281,10 @@ function Dashboard() {
               >
                 <div className="h-72">
                   <ResponsiveContainer>
-                    <AreaChart data={revenueData} margin={{ top: 5, right: 8, left: -12, bottom: 0 }}>
+                    <AreaChart
+                      data={revenueData}
+                      margin={{ top: 5, right: 8, left: -12, bottom: 0 }}
+                    >
                       <defs>
                         <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="var(--color-chart-1)" stopOpacity={0.32} />
@@ -272,7 +295,11 @@ function Dashboard() {
                           <stop offset="100%" stopColor="var(--color-chart-3)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
+                      <CartesianGrid
+                        stroke="var(--color-border)"
+                        strokeDasharray="3 3"
+                        vertical={false}
+                      />
                       <XAxis
                         dataKey="label"
                         stroke="var(--color-muted-foreground)"
@@ -282,14 +309,53 @@ function Dashboard() {
                         interval="preserveStartEnd"
                         minTickGap={24}
                       />
-                      <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={currency} />
-                      <Tooltip
-                        cursor={{ stroke: "var(--color-border)", strokeWidth: 1, strokeDasharray: "3 3" }}
-                        content={<CustomTooltip format={currency} hint={`${rangeLabel} window · mock data`} />}
+                      <YAxis
+                        stroke="var(--color-muted-foreground)"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={currency}
                       />
-                      <Area type="monotone" dataKey="revenue" stroke="var(--color-chart-1)" strokeWidth={2} fill="url(#rev)" name="Revenue" activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--color-card)" }} />
-                      <Area type="monotone" dataKey="automated" stroke="var(--color-chart-3)" strokeWidth={2} fill="url(#auto)" name="Automated" activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--color-card)" }} />
-                      <Line type="monotone" dataKey="forecast" stroke="var(--color-muted-foreground)" strokeWidth={1.5} strokeDasharray="4 4" dot={false} name="Forecast" />
+                      <Tooltip
+                        cursor={{
+                          stroke: "var(--color-border)",
+                          strokeWidth: 1,
+                          strokeDasharray: "3 3",
+                        }}
+                        content={
+                          <CustomTooltip
+                            format={currency}
+                            hint={`${rangeLabel} window · mock data`}
+                          />
+                        }
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="var(--color-chart-1)"
+                        strokeWidth={2}
+                        fill="url(#rev)"
+                        name="Revenue"
+                        activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--color-card)" }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="automated"
+                        stroke="var(--color-chart-3)"
+                        strokeWidth={2}
+                        fill="url(#auto)"
+                        name="Automated"
+                        activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--color-card)" }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="forecast"
+                        stroke="var(--color-muted-foreground)"
+                        strokeWidth={1.5}
+                        strokeDasharray="4 4"
+                        dot={false}
+                        name="Forecast"
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -313,7 +379,14 @@ function Dashboard() {
                           <Cell key={i} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip content={<CustomTooltip format={(v) => `${v}%`} hint="Share of monthly cloud spend" />} />
+                      <Tooltip
+                        content={
+                          <CustomTooltip
+                            format={(v) => `${v}%`}
+                            hint="Share of monthly cloud spend"
+                          />
+                        }
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -332,36 +405,110 @@ function Dashboard() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <ChartCard title="Operational Capacity" subtitle="Utilization by team, current sprint">
+              <ChartCard
+                title="Operational Capacity"
+                subtitle="Utilization by team, current sprint"
+              >
                 <div className="h-64">
                   <ResponsiveContainer>
-                    <BarChart data={capacityData} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
-                      <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="team" stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} />
+                    <BarChart
+                      data={capacityData}
+                      margin={{ top: 5, right: 8, left: -18, bottom: 0 }}
+                    >
+                      <CartesianGrid
+                        stroke="var(--color-border)"
+                        strokeDasharray="3 3"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="team"
+                        stroke="var(--color-muted-foreground)"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="var(--color-muted-foreground)"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(v) => `${v}%`}
+                      />
                       <Tooltip
                         cursor={{ fill: "var(--color-muted)", opacity: 0.5 }}
-                        content={<CustomTooltip format={(v) => `${v}%`} hint="Sprint-to-date utilization" />}
+                        content={
+                          <CustomTooltip
+                            format={(v) => `${v}%`}
+                            hint="Sprint-to-date utilization"
+                          />
+                        }
                       />
-                      <Bar dataKey="used" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} name="Utilization" />
+                      <Bar
+                        dataKey="used"
+                        fill="var(--color-chart-1)"
+                        radius={[4, 4, 0, 0]}
+                        name="Utilization"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </ChartCard>
 
-              <ChartCard title="Workflow Executions" subtitle={`Runs across 247 active workflows · ${rangeLabel}`}>
+              <ChartCard
+                title="Workflow Executions"
+                subtitle={`Runs across 247 active workflows · ${rangeLabel}`}
+              >
                 <div className="h-64">
                   <ResponsiveContainer>
                     <LineChart data={runsData} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
-                      <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="label" stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} interval="preserveStartEnd" minTickGap={24} />
-                      <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                      <Tooltip
-                        cursor={{ stroke: "var(--color-border)", strokeWidth: 1, strokeDasharray: "3 3" }}
-                        content={<CustomTooltip format={number} hint="Successful vs. failed executions" />}
+                      <CartesianGrid
+                        stroke="var(--color-border)"
+                        strokeDasharray="3 3"
+                        vertical={false}
                       />
-                      <Line type="monotone" dataKey="runs" stroke="var(--color-chart-2)" strokeWidth={2.5} dot={false} activeDot={{ r: 5, strokeWidth: 2, stroke: "var(--color-card)" }} name="Runs" />
-                      <Line type="monotone" dataKey="failures" stroke="var(--color-destructive)" strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--color-card)" }} name="Failures" />
+                      <XAxis
+                        dataKey="label"
+                        stroke="var(--color-muted-foreground)"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                        interval="preserveStartEnd"
+                        minTickGap={24}
+                      />
+                      <YAxis
+                        stroke="var(--color-muted-foreground)"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <Tooltip
+                        cursor={{
+                          stroke: "var(--color-border)",
+                          strokeWidth: 1,
+                          strokeDasharray: "3 3",
+                        }}
+                        content={
+                          <CustomTooltip format={number} hint="Successful vs. failed executions" />
+                        }
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="runs"
+                        stroke="var(--color-chart-2)"
+                        strokeWidth={2.5}
+                        dot={false}
+                        activeDot={{ r: 5, strokeWidth: 2, stroke: "var(--color-card)" }}
+                        name="Runs"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="failures"
+                        stroke="var(--color-destructive)"
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--color-card)" }}
+                        name="Failures"
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>

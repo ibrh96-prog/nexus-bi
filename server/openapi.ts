@@ -24,7 +24,8 @@ export const openApiSpec = swaggerJSDoc({
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
-          description: "JWT issued by the auth service. Include as `Authorization: Bearer <token>`.",
+          description:
+            "JWT issued by the auth service. Include as `Authorization: Bearer <token>`.",
         },
         webhookSignature: {
           type: "apiKey",
@@ -330,7 +331,12 @@ export const openApiSpec = swaggerJSDoc({
             "Compatible with Stripe (`Stripe-Signature`) and GitHub (`X-Hub-Signature-256`).",
           security: [{ webhookSignature: [] }],
           parameters: [
-            { name: "workflowId", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+            {
+              name: "workflowId",
+              in: "path",
+              required: true,
+              schema: { type: "string", format: "uuid" },
+            },
             { name: "integrationSecret", in: "path", required: true, schema: { type: "string" } },
           ],
           requestBody: {

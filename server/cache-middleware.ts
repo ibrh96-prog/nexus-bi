@@ -1,10 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import {
-  METRICS_CACHE_PREFIX,
-  METRICS_TTL_SECONDS,
-  cacheGetJson,
-  cacheSetJson,
-} from "./cache";
+import { METRICS_CACHE_PREFIX, METRICS_TTL_SECONDS, cacheGetJson, cacheSetJson } from "./cache";
 
 /**
  * Build a cache key that varies by the querystring shape the /metrics
@@ -21,11 +16,7 @@ function metricsCacheKey(req: Request): string {
  * Serves cached JSON on HIT and, on MISS, intercepts res.json() to write
  * the payload into Redis with a 5-minute TTL before it goes out the wire.
  */
-export async function cacheMetrics(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+export async function cacheMetrics(req: Request, res: Response, next: NextFunction): Promise<void> {
   if (req.method !== "GET") return next();
 
   const key = metricsCacheKey(req);

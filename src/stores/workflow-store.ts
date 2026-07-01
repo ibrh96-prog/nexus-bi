@@ -67,7 +67,10 @@ interface WorkflowState extends Snapshot {
   reset: (snapshot?: Snapshot) => void;
 
   // Remote (socket) appliers — do NOT re-emit.
-  applyRemoteNodeUpdate: (nodeId: string, patch: { position?: NodePosition; data?: Record<string, unknown>; type?: string }) => void;
+  applyRemoteNodeUpdate: (
+    nodeId: string,
+    patch: { position?: NodePosition; data?: Record<string, unknown>; type?: string },
+  ) => void;
   applyRemoteEdgeAdd: (edge: WorkflowEdge) => void;
 }
 
@@ -129,9 +132,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       return {
         history: pushHistory(state.history, state),
         future: [],
-        nodes: state.nodes.map((n) =>
-          n.id === id ? { ...n, position: { ...position } } : n,
-        ),
+        nodes: state.nodes.map((n) => (n.id === id ? { ...n, position: { ...position } } : n)),
       };
     });
     if (changed) {
@@ -168,7 +169,6 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         edges: state.edges.filter((e) => e.source !== id && e.target !== id),
       };
     }),
-
 
   undo: () =>
     set((state) => {
@@ -247,7 +247,6 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     }
   },
 
-
   reset: (initial) =>
     set(() => ({
       nodes: initial ? snapshot(initial).nodes : [],
@@ -292,7 +291,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   applyRemoteEdgeAdd: (edge) =>
     set((state) => {
       if (state.edges.some((e) => e.id === edge.id)) return state;
-      if (state.edges.some((e) => e.source === edge.source && e.target === edge.target)) return state;
+      if (state.edges.some((e) => e.source === edge.source && e.target === edge.target))
+        return state;
       return { edges: [...state.edges, { ...edge }] };
     }),
 }));

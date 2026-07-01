@@ -8,7 +8,6 @@ import { auditFromRequest } from "../audit";
 
 const router = Router();
 
-
 const nodeSchema = z.object({
   id: z.string().min(1),
   type: z.string().min(1),
@@ -126,6 +125,5 @@ router.delete(
     res.status(204).end();
   }),
 );
-
 
 export default router;

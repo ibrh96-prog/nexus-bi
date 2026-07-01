@@ -37,10 +37,7 @@ router.get("/", requireAnyRole, async (_req: Request, res: Response) => {
 
 router.post("/", requireEditor, async (req: Request, res: Response) => {
   const body = createSchema.parse(req.body);
-  if (
-    body.signatureScheme !== "none" &&
-    (!body.signingSecret || !body.signatureHeader)
-  ) {
+  if (body.signatureScheme !== "none" && (!body.signingSecret || !body.signatureHeader)) {
     return res
       .status(400)
       .json({ error: "signature scheme requires signingSecret and signatureHeader" });

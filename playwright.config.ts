@@ -15,9 +15,7 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
-  projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-  ],
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   // Assumes `npm run dev` is running. Uncomment to auto-start:
   // webServer: {
   //   command: "npm run dev",

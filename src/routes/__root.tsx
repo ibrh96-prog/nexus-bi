@@ -80,23 +80,46 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Nexus BI — AI Workflow & Business Intelligence" },
-      { name: "description", content: "Enterprise BI and AI workflow automation. Unify data, predict bottlenecks, and automate operations." },
+      {
+        name: "description",
+        content:
+          "Enterprise BI and AI workflow automation. Unify data, predict bottlenecks, and automate operations.",
+      },
       { name: "author", content: "Nexus BI" },
       { property: "og:title", content: "Nexus BI — AI Workflow & Business Intelligence" },
-      { property: "og:description", content: "Enterprise BI and AI workflow automation. Unify data, predict bottlenecks, and automate operations." },
+      {
+        property: "og:description",
+        content:
+          "Enterprise BI and AI workflow automation. Unify data, predict bottlenecks, and automate operations.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Nexus BI — AI Workflow & Business Intelligence" },
-      { name: "twitter:description", content: "Enterprise BI and AI workflow automation. Unify data, predict bottlenecks, and automate operations." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b565491e-838c-4a74-a0ae-252bdb9652bb" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b565491e-838c-4a74-a0ae-252bdb9652bb" },
+      {
+        name: "twitter:description",
+        content:
+          "Enterprise BI and AI workflow automation. Unify data, predict bottlenecks, and automate operations.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b565491e-838c-4a74-a0ae-252bdb9652bb",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b565491e-838c-4a74-a0ae-252bdb9652bb",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,

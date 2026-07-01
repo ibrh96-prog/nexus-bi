@@ -30,7 +30,9 @@ test.describe("Visual Workflow Builder", () => {
     const canvas = page.locator('[data-testid="workflow-canvas"]');
     await expect(canvas).toBeVisible();
 
-    const paletteItem = page.locator('[data-testid="palette-item"][data-node-type="action"]').first();
+    const paletteItem = page
+      .locator('[data-testid="palette-item"][data-node-type="action"]')
+      .first();
     await expect(paletteItem).toBeVisible();
 
     const nodesBefore = await page.locator('[data-testid="workflow-node"]').count();
@@ -48,7 +50,9 @@ test.describe("Visual Workflow Builder", () => {
 
     // Fallback: dispatch synthetic HTML5 drag events if pointer DnD is no-op.
     if ((await page.locator('[data-testid="workflow-node"]').count()) === nodesBefore) {
-      await paletteItem.dragTo(canvas, { targetPosition: { x: canvasBox.width / 2, y: canvasBox.height / 2 } });
+      await paletteItem.dragTo(canvas, {
+        targetPosition: { x: canvasBox.width / 2, y: canvasBox.height / 2 },
+      });
     }
 
     const nodesAfter = page.locator('[data-testid="workflow-node"]');

@@ -11,10 +11,7 @@ export const pool = new Pool({
   connectionString,
   max: Number(process.env.PG_POOL_MAX ?? 10),
   idleTimeoutMillis: 30_000,
-  ssl:
-    process.env.PG_SSL === "true"
-      ? { rejectUnauthorized: false }
-      : undefined,
+  ssl: process.env.PG_SSL === "true" ? { rejectUnauthorized: false } : undefined,
 });
 
 pool.on("error", (err) => {

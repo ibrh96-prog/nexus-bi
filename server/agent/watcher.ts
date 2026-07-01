@@ -31,10 +31,7 @@ async function processPendingAnomalies(): Promise<void> {
       // eslint-disable-next-line no-console
       console.log(`[agent] handling insight ${insight.id} (${insight.severity})`);
       const result = await runAgentForInsight(insight);
-      await db
-        .update(aiInsights)
-        .set({ status: "handled" })
-        .where(eq(aiInsights.id, insight.id));
+      await db.update(aiInsights).set({ status: "handled" }).where(eq(aiInsights.id, insight.id));
       // eslint-disable-next-line no-console
       console.log(
         `[agent] insight ${insight.id} handled — tools:`,

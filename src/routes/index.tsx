@@ -6,9 +6,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Nexus BI — AI Workflow & Business Intelligence" },
-      { name: "description", content: "Nexus BI unifies your operational data, surfaces anomalies before they become outages, and executes workflows across your stack." },
+      {
+        name: "description",
+        content:
+          "Nexus BI unifies your operational data, surfaces anomalies before they become outages, and executes workflows across your stack.",
+      },
       { property: "og:title", content: "Nexus BI — AI Workflow & Business Intelligence" },
-      { property: "og:description", content: "Nexus BI unifies your operational data, surfaces anomalies before they become outages, and executes workflows across your stack." },
+      {
+        property: "og:description",
+        content:
+          "Nexus BI unifies your operational data, surfaces anomalies before they become outages, and executes workflows across your stack.",
+      },
       { property: "og:type", content: "website" },
     ],
   }),
@@ -60,7 +68,9 @@ function LandingPage() {
               Stop Guessing. Start Automating Intelligence.
             </h1>
             <h2 className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-              Nexus BI unifies your operational data, surfaces anomalies before they become outages, and executes workflows across your stack—so your team moves from reactive reporting to autonomous decision-making.
+              Nexus BI unifies your operational data, surfaces anomalies before they become outages,
+              and executes workflows across your stack—so your team moves from reactive reporting to
+              autonomous decision-making.
             </h2>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" asChild>

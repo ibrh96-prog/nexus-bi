@@ -4,11 +4,7 @@
 import { initSentry, sentryRequestHandler, sentryErrorHandler } from "./observability";
 initSentry();
 
-import express, {
-  type ErrorRequestHandler,
-  type Request,
-  type Response,
-} from "express";
+import express, { type ErrorRequestHandler, type Request, type Response } from "express";
 import { createServer } from "http";
 import { ZodError } from "zod";
 import workflowsRouter from "./routes/workflows";
@@ -56,7 +52,6 @@ app.use(sentryRequestHandler);
 app.use(securityHeaders);
 app.use(strictCors);
 
-
 // Baseline rate limit across the whole API surface.
 app.use(standardLimiter);
 
@@ -83,11 +78,6 @@ app.use("/api/integrations", integrationsRouter);
 app.use("/api/billing/checkout", strictLimiter);
 app.use("/api/billing", billingRouter);
 
-
-
-
-
-
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
     return res.status(400).json({ error: "Validation failed", issues: err.issues });
@@ -112,4 +102,3 @@ if (process.env.NODE_ENV !== "test") {
   });
   startAnomalyWatcher();
 }
-

@@ -18,11 +18,7 @@ router.get(
   "/",
   wrap(async (req, res) => {
     const limit = Math.min(Number(req.query.limit ?? 100) || 100, 500);
-    const rows = await db
-      .select()
-      .from(auditLogs)
-      .orderBy(desc(auditLogs.timestamp))
-      .limit(limit);
+    const rows = await db.select().from(auditLogs).orderBy(desc(auditLogs.timestamp)).limit(limit);
     res.json(rows);
   }),
 );

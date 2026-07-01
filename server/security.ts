@@ -42,7 +42,13 @@ export const strictCors: RequestHandler = cors({
     return cb(new Error(`CORS: origin ${origin} is not allowed`));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Stripe-Signature", "X-Hub-Signature-256"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Stripe-Signature",
+    "X-Hub-Signature-256",
+  ],
   credentials: true,
   maxAge: 86_400,
 });
@@ -110,7 +116,11 @@ function sanitizeValue(value: unknown): unknown {
  * Applied AFTER express.json() and BEFORE any route handler runs.
  * Webhook routes mounted with express.raw() are unaffected.
  */
-export const sanitizeInputs: RequestHandler = (req: Request, _res: Response, next: NextFunction) => {
+export const sanitizeInputs: RequestHandler = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
   if (req.body && typeof req.body === "object") {
     req.body = sanitizeValue(req.body);
   }

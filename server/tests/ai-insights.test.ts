@@ -45,10 +45,20 @@ const sampleMetric = {
 
 const goodModelPayload = {
   anomalies: [
-    { type: "anomaly", message: "Revenue dipped 12% vs. 7-day mean.", severity: "medium", metric: "revenue" },
+    {
+      type: "anomaly",
+      message: "Revenue dipped 12% vs. 7-day mean.",
+      severity: "medium",
+      metric: "revenue",
+    },
   ],
   recommendations: [
-    { type: "recommendation", message: "Rebalance queue workers during 14:00-16:00 UTC peak.", severity: "low", metric: "avg_resolution_seconds" },
+    {
+      type: "recommendation",
+      message: "Rebalance queue workers during 14:00-16:00 UTC peak.",
+      severity: "low",
+      metric: "avg_resolution_seconds",
+    },
   ],
   summary: "Overall healthy; minor revenue variance.",
 };
@@ -145,10 +155,9 @@ describe("POST /api/ai/insights", () => {
 
   it("returns 502 when the model returns malformed JSON", async () => {
     fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({ choices: [{ message: { content: "not json at all" } }] }),
-        { status: 200 },
-      ),
+      new Response(JSON.stringify({ choices: [{ message: { content: "not json at all" } }] }), {
+        status: 200,
+      }),
     );
 
     const res = await fetch(`${baseUrl}/api/ai/insights`, { method: "POST" });

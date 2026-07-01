@@ -61,7 +61,8 @@ export async function runAgentForInsight(insight: AiInsight): Promise<AgentRunRe
     const toolCalls: AgentRunResult["toolCalls"] = [];
     for (const m of messages) {
       const calls = (m as { tool_calls?: Array<{ name: string; args: unknown }> }).tool_calls;
-      if (Array.isArray(calls)) toolCalls.push(...calls.map((c) => ({ name: c.name, args: c.args })));
+      if (Array.isArray(calls))
+        toolCalls.push(...calls.map((c) => ({ name: c.name, args: c.args })));
     }
 
     return { insightId: insight.id, finalMessage, toolCalls };

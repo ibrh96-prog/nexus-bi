@@ -32,10 +32,7 @@ export function setByPath(target: Record<string, unknown>, path: string, value: 
 }
 
 /** Apply mapping rules to a payload and produce the normalized input object. */
-export function applyMapping(
-  payload: unknown,
-  rules: MappingRule[],
-): Record<string, unknown> {
+export function applyMapping(payload: unknown, rules: MappingRule[]): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const rule of rules) {
     const raw = getByPath(payload, rule.source);

@@ -38,7 +38,7 @@ bunx drizzle-kit migrate --dialect=postgresql --migrations-folder=./server/migra
 
 - `GET/POST     /api/workflows`
 - `GET/PUT/DELETE /api/workflows/:id`
-- `GET/POST     /api/metrics`  (`?limit=`)
+- `GET/POST     /api/metrics` (`?limit=`)
 - `GET/PUT/DELETE /api/metrics/:id`
 - `GET/POST     /api/insights` (`?status=&type=`)
 - `GET/PUT/DELETE /api/insights/:id`

@@ -22,11 +22,8 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
   role: userRoleEnum("role").notNull().default("viewer"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
-
 
 /* ------------------------------------------------------------------ */
 /* workflows                                                           */
@@ -53,11 +50,15 @@ export const workflows = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    nodes: jsonb("nodes").$type<WorkflowNode[]>().notNull().default(sql`'[]'::jsonb`),
-    edges: jsonb("edges").$type<WorkflowEdge[]>().notNull().default(sql`'[]'::jsonb`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    nodes: jsonb("nodes")
+      .$type<WorkflowNode[]>()
       .notNull()
-      .defaultNow(),
+      .default(sql`'[]'::jsonb`),
+    edges: jsonb("edges")
+      .$type<WorkflowEdge[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     userIdx: index("workflows_user_id_idx").on(t.userId),
@@ -75,9 +76,7 @@ export const metrics = pgTable(
     activeWorkflows: integer("active_workflows").notNull(),
     predictedChurn: numeric("predicted_churn", { precision: 5, scale: 4 }).notNull(),
     averageResolutionTime: integer("average_resolution_time").notNull(), // seconds
-    recordedAt: timestamp("recorded_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     recordedIdx: index("metrics_recorded_at_idx").on(t.recordedAt),
@@ -101,16 +100,11 @@ export const aiInsights = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     type: text("type").$type<InsightType>().notNull(),
-    severity: text("severity")
-      .$type<InsightSeverity>()
-      .notNull()
-      .default("low"),
+    severity: text("severity").$type<InsightSeverity>().notNull().default("low"),
     message: text("message").notNull(),
     context: jsonb("context").$type<Record<string, unknown>>(),
     status: text("status").$type<InsightStatus>().notNull().default("pending"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     statusIdx: index("ai_insights_status_idx").on(t.status),
@@ -133,9 +127,7 @@ export const agentActions = pgTable(
     output: jsonb("output").$type<Record<string, unknown>>(),
     status: text("status").notNull().default("success"), // success | error
     error: text("error"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     insightIdx: index("agent_actions_insight_id_idx").on(t.insightId),
@@ -161,7 +153,6 @@ export const agentActionsRelations = relations(agentActions, ({ one }) => ({
   }),
 }));
 
-
 /* ------------------------------------------------------------------ */
 /* audit_logs — append-only, hash-chained                              */
 /* ------------------------------------------------------------------ */
@@ -176,9 +167,7 @@ export const auditLogs = pgTable(
     payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
     prevHash: text("prev_hash").notNull(),
     rowHash: text("row_hash").notNull().unique(),
-    timestamp: timestamp("timestamp", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    timestamp: timestamp("timestamp", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     userIdx: index("audit_logs_user_id_idx").on(t.userId),
@@ -218,13 +207,13 @@ export const integrations = pgTable(
     name: text("name").notNull(),
     provider: text("provider").notNull().default("custom"), // stripe | github | custom | ...
     secret: text("secret").notNull().unique(), // URL segment; identifies the integration
-    signatureScheme: text("signature_scheme")
-      .$type<SignatureScheme>()
-      .notNull()
-      .default("none"),
+    signatureScheme: text("signature_scheme").$type<SignatureScheme>().notNull().default("none"),
     signatureHeader: text("signature_header"), // e.g. X-Hub-Signature-256, Stripe-Signature
     signingSecret: text("signing_secret"), // HMAC key for signature verification
-    mappingRules: jsonb("mapping_rules").$type<MappingRule[]>().notNull().default(sql`'[]'::jsonb`),
+    mappingRules: jsonb("mapping_rules")
+      .$type<MappingRule[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
     enabled: text("enabled").notNull().default("true"), // "true"/"false" as text for simple toggling
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -276,10 +265,7 @@ export const subscriptionStatuses = [
   "unpaid",
 ] as const;
 export type SubscriptionStatus = (typeof subscriptionStatuses)[number];
-export const subscriptionStatusEnum = pgEnum(
-  "subscription_status",
-  subscriptionStatuses,
-);
+export const subscriptionStatusEnum = pgEnum("subscription_status", subscriptionStatuses);
 
 export const billingCustomers = pgTable(
   "billing_customers",
@@ -356,7 +342,3 @@ export type BillingCustomer = typeof billingCustomers.$inferSelect;
 export type NewBillingCustomer = typeof billingCustomers.$inferInsert;
 export type UsageRecord = typeof usageRecords.$inferSelect;
 export type NewUsageRecord = typeof usageRecords.$inferInsert;
-
-
-
-
