@@ -19,6 +19,9 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
     },
     rules: {
+      "no-console": "warn",
+      "react-refresh/only-export-components": "off",
+      "no-control-regex": "warn",
       ...reactHooks.configs.recommended.rules,
       "no-restricted-imports": [
         "error",
