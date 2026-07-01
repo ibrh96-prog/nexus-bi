@@ -1,0 +1,25 @@
+# Ignore anything not needed inside the build context to keep image small
+# and to prevent accidental leakage of secrets.
+node_modules
+**/node_modules
+dist
+**/dist
+.git
+.github
+.vscode
+.idea
+coverage
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+Dockerfile
+.dockerignore
+README.md
+docs
+tmp
+/tmp
+.workspace
+.agents
+.claude
