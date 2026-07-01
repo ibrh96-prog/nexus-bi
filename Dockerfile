@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund
 
 # Backend deps
-COPY server/package.json server/package-lock.json* ./server/
+COPY package.json package-lock.json* ./server/
 RUN --mount=type=cache,target=/root/.npm \
     cd server && npm ci --no-audit --no-fund
 
