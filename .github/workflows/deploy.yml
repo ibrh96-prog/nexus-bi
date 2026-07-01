@@ -54,19 +54,19 @@ jobs:
 
       # ---- backend ---------------------------------------------------
       - name: Install backend deps
-        working-directory: server
+        
         run: npm install --no-audit --no-fund
 
       - name: Backend typecheck
-        working-directory: server
+        
         run: npx tsc --noEmit
 
       - name: Backend tests
-        working-directory: server
+        
         run: npm test --if-present
 
       - name: Build backend
-        working-directory: server
+        
         run: npx tsc -p tsconfig.json
 
   # -----------------------------------------------------------------------
