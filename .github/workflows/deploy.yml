@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
   # Image name in the registry. Override REGISTRY / IMAGE_NAME via repo vars
   # if you push somewhere other than Docker Hub.
   REGISTRY: ${{ vars.REGISTRY || 'docker.io' }}
