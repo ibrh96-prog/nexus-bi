@@ -1,42 +1,44 @@
 # syntax=docker/dockerfile:1.7
 ARG NODE_VERSION=20-alpine
 
-# ---------- 1. deps: install root + server deps --------
+# ---------- 1. deps: Root bağımlılıklarını kur ----------
 FROM node:${NODE_VERSION} AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --no-audit --no-fund
 
-# ---------- 2. build-frontend: compile Vite bundle -------------------------
+# ---------- 2. build-frontend: Vite ile frontend build'i ----------
 FROM node:${NODE_VERSION} AS build-frontend
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Vite build çıktısının her zaman 'dist' olduğunu garanti ediyoruz
+# Frontend'i build et
 RUN npm run build
 
-# ---------- 3. build-backend: compile TS -> JS -----------------------------
+# ---------- 3. build-backend: TypeScript ile backend build'i ----------
 FROM node:${NODE_VERSION} AS build-backend
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY server/ ./server/
-COPY tsconfig.json ./
-# Backend için gerekli bağımlılıkları kopyalıyoruz
-RUN npx tsc -p server/tsconfig.json || echo "Build continues despite errors"
+COPY . .
+# Backend'i derle ve çıktıyı ./server/dist klasörüne yönlendir
+RUN npx tsc -p server/tsconfig.json --outDir server/dist
 
-# ---------- 4. runtime: minimal image --------------------------------------
+# ---------- 4. runtime: Final imaj ----------
 FROM node:${NODE_VERSION} AS runtime
 WORKDIR /app
 ENV NODE_ENV=production PORT=3001
 
 RUN addgroup -S app && adduser -S app -G app
 
-# Frontend: build-frontend aşamasından 'dist' klasörünü alıp 'public'e kopyalıyoruz
+# Frontend build çıktılarını al
 COPY --from=build-frontend /app/dist ./public
 
-# Backend: build-backend aşamasından derlenmiş dosyaları kopyalıyoruz
+# Backend derlenmiş dosyaları al
 COPY --from=build-backend /app/server/dist ./server/dist
 COPY --from=deps /app/package.json ./package.json
+
+# Gerekirse backend'in çalışma zamanı bağımlılıklarını burada kurabilirsin
+# (Örn: npm install --omit=dev)
 
 USER app
 EXPOSE 3001
