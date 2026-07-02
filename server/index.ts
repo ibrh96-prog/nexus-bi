@@ -4,7 +4,7 @@
 import { initSentry, sentryRequestHandler, sentryErrorHandler } from "./observability";
 initSentry();
 
-import express, { type ErrorRequestHandler, type Request, type Response } from "express";
+import express, { Request, Response, ErrorRequestHandler } from "express";
 import { createServer } from "http";
 import { ZodError } from "zod";
 import workflowsRouter from "./routes/workflows";
