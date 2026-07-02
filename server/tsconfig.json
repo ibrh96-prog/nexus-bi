@@ -1,3 +1,1 @@
-{"extends": "../tsconfig.json", "compilerOptions": {
-    "skipLibCheck": true,
-    "noEmitOnError": false,"baseUrl": ".", "paths": {"*": ["../node_modules/*"]}}, "include": ["**/*.ts"]}
+{"extends": "../tsconfig.json", "compilerOptions": {"outDir": "dist", "rootDir": "."}, "include": ["**/*.ts"]}

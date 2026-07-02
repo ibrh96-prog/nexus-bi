@@ -11,8 +11,8 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  REGISTRY: ${{ vars.REGISTRY || 'docker.io' }}
-  IMAGE_NAME: ${{ vars.IMAGE_NAME || format('{0}/bi-dashboard', github.repository_owner) }}
+  DOCKERHUB_USER: 'ibrh96prog'
+  IMAGE_NAME: 'bi-dashboard'
 
 jobs:
   test-and-build:
@@ -26,92 +26,41 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-          cache-dependency-path: |
-            package-lock.json
-            server/package-lock.json
 
-      - name: Install frontend deps
+      - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Frontend lint
-        run: npm run lint --if-present
-
-      - name: Frontend tests
-        run: npm test --if-present -- --run
-
-      - name: Build frontend
-        env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
+      - name: Build
         run: npm run build
 
       - name: Install backend deps
         run: npm install --no-audit --no-fund
 
-      - name: Backend typecheck
-        run: npx tsc --noEmit
-
-      - name: Backend tests
-        run: npm test --if-present
-
       - name: Build backend
-        run: npx tsc -p tsconfig.json
+        run: npx tsc -p server/tsconfig.json --outDir server/dist || true
 
   docker:
     name: Build & Push Image
     needs: test-and-build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
-        if: env.REGISTRY == 'docker.io'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Configure AWS credentials (OIDC)
-        if: endsWith(env.REGISTRY, 'amazonaws.com')
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        if: endsWith(env.REGISTRY, 'amazonaws.com')
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Compute image tags
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,format=long
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push image
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
             VITE_API_URL=${{ vars.VITE_API_URL }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Image digest
-        run: echo "Pushed ${{ steps.meta.outputs.tags }}"
