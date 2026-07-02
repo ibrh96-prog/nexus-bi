@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
   LineChart,
@@ -22,9 +23,26 @@ import { AiInsightsPanel } from "@/components/ai-insights-panel";
 import { PageHeader } from "@/components/page-header";
 import { DashboardSkeleton } from "@/components/dashboard-skeleton";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Button } from "@/components/ui/button";
-import { metricCards, revenueSeries, capacityData, resourceDistribution } from "@/lib/mock-data";
+import {
+  getMetrics,
+  getRevenueSeries,
+  getCapacity,
+  getResourceDistribution,
+  type Metric,
+  type RevenueSeriesPoint,
+} from "@/lib/api";
+import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
+
+const RESOURCE_COLORS = [
+  "var(--color-chart-1)",
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
+  "var(--color-chart-5)",
+];
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -49,6 +67,56 @@ const currency = (v: number) =>
   }).format(v);
 const number = (v: number) => new Intl.NumberFormat("en-US").format(Math.round(v));
 
+function formatResolution(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return `${m}m ${s}s`;
+}
+
+function pctChange(curr: number, prev: number | undefined): number {
+  if (prev === undefined || prev === 0) return 0;
+  return ((curr - prev) / prev) * 100;
+}
+
+// Metrics is a snapshot table (one row per recording). `rows` is ordered
+// newest-first with at most 2 rows, so `previous` is undefined until a
+// second snapshot has been recorded.
+function buildMetricCards(rows: Metric[]) {
+  if (rows.length === 0) return [];
+  const [latest, previous] = rows;
+  const hint = previous ? "vs. previous snapshot" : "First recorded snapshot";
+  return [
+    {
+      label: "Automation ROI",
+      value: currency(latest.revenue),
+      change: pctChange(latest.revenue, previous?.revenue),
+      trend: "up" as const,
+      hint,
+    },
+    {
+      label: "Active Workflows",
+      value: number(latest.activeWorkflows),
+      change: pctChange(latest.activeWorkflows, previous?.activeWorkflows),
+      trend: "up" as const,
+      hint,
+    },
+    {
+      label: "Predicted Churn",
+      value: `${(latest.predictedChurn * 100).toFixed(1)}%`,
+      change: pctChange(latest.predictedChurn, previous?.predictedChurn),
+      trend: "down" as const,
+      hint: "AI 30-day forecast",
+    },
+    {
+      label: "Avg. Resolution",
+      value: formatResolution(latest.averageResolutionTime),
+      change: pctChange(latest.averageResolutionTime, previous?.averageResolutionTime),
+      trend: "down" as const,
+      hint,
+    },
+  ];
+}
+
 // ---------- Time range ----------
 type RangeKey = "7D" | "30D" | "90D" | "12M";
 const RANGES: { key: RangeKey; label: string; points: number; step: "day" | "week" | "month" }[] = [
@@ -64,11 +132,12 @@ function seeded(i: number, salt = 1) {
   return x - Math.floor(x);
 }
 
-function buildRevenue(range: RangeKey) {
+function buildRevenue(range: RangeKey, series: RevenueSeriesPoint[]) {
   const cfg = RANGES.find((r) => r.key === range)!;
+  if (series.length === 0) return [];
   if (cfg.step === "month") {
-    return revenueSeries.map((r) => ({
-      label: r.month,
+    return series.map((r) => ({
+      label: r.period,
       revenue: r.revenue,
       forecast: r.forecast,
       automated: r.automated,
@@ -76,8 +145,9 @@ function buildRevenue(range: RangeKey) {
   }
   const now = new Date();
   const points = cfg.points;
-  // Scale monthly totals down to daily/weekly.
-  const monthly = revenueSeries[revenueSeries.length - 1];
+  // Scale the latest monthly total down to daily/weekly — there's no real
+  // sub-monthly revenue tracking, so shorter ranges are an interpolation.
+  const monthly = series[series.length - 1];
   const base = cfg.step === "day" ? monthly.revenue / 30 : monthly.revenue / 4.3;
   const autoRatio = monthly.automated / monthly.revenue;
   const out: Array<{ label: string; revenue: number; forecast: number; automated: number }> = [];
@@ -233,11 +303,54 @@ function ChartCard({
 }
 
 function Dashboard() {
-  const loading = useSimulatedLoading(500);
+  const { ready: authReady } = useRequireAuth();
+  const token = useAuthStore((s) => s.token);
   const [range, setRange] = useState<RangeKey>("30D");
 
-  const revenueData = useMemo(() => buildRevenue(range), [range]);
+  const metricsQuery = useQuery({
+    queryKey: ["metrics", "latest"],
+    queryFn: () => getMetrics(2),
+    enabled: !!token,
+  });
+  const revenueQuery = useQuery({
+    queryKey: ["revenue-series"],
+    queryFn: getRevenueSeries,
+    enabled: !!token,
+  });
+  const capacityQuery = useQuery({
+    queryKey: ["capacity"],
+    queryFn: getCapacity,
+    enabled: !!token,
+  });
+  const resourceQuery = useQuery({
+    queryKey: ["resource-distribution"],
+    queryFn: getResourceDistribution,
+    enabled: !!token,
+  });
+
+  const loading =
+    useSimulatedLoading(500) ||
+    !authReady ||
+    metricsQuery.isLoading ||
+    revenueQuery.isLoading ||
+    capacityQuery.isLoading ||
+    resourceQuery.isLoading;
+
+  const metricCards = useMemo(() => buildMetricCards(metricsQuery.data ?? []), [metricsQuery.data]);
+  const revenueData = useMemo(
+    () => buildRevenue(range, revenueQuery.data ?? []),
+    [range, revenueQuery.data],
+  );
   const runsData = useMemo(() => buildRuns(range), [range]);
+  const capacityData = capacityQuery.data ?? [];
+  const resourceDistribution = useMemo(
+    () =>
+      (resourceQuery.data ?? []).map((r, i) => ({
+        ...r,
+        color: RESOURCE_COLORS[i % RESOURCE_COLORS.length],
+      })),
+    [resourceQuery.data],
+  );
 
   const rangeLabel = RANGES.find((r) => r.key === range)!.label;
 
@@ -322,12 +435,7 @@ function Dashboard() {
                           strokeWidth: 1,
                           strokeDasharray: "3 3",
                         }}
-                        content={
-                          <CustomTooltip
-                            format={currency}
-                            hint={`${rangeLabel} window · mock data`}
-                          />
-                        }
+                        content={<CustomTooltip format={currency} hint={`${rangeLabel} window`} />}
                       />
                       <Area
                         type="monotone"
@@ -456,7 +564,7 @@ function Dashboard() {
 
               <ChartCard
                 title="Workflow Executions"
-                subtitle={`Runs across 247 active workflows · ${rangeLabel}`}
+                subtitle={`Runs across ${metricsQuery.data?.[0]?.activeWorkflows ?? 0} active workflows · ${rangeLabel} · illustrative`}
               >
                 <div className="h-64">
                   <ResponsiveContainer>

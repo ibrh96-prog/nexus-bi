@@ -47,7 +47,7 @@ function LandingPage() {
           </nav>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/dashboard">Sign in</Link>
+              <Link to="/login">Sign in</Link>
             </Button>
             <Button size="sm" asChild>
               <Link to="/dashboard">Get started</Link>

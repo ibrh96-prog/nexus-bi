@@ -16,6 +16,13 @@ dist-ssr
 .nitro
 *.local
 
+# Secrets — never commit real env values or local dev-server configs that
+# may embed a DB connection string for local testing.
+.env
+.env.*
+!.env.example
+.claude/launch.json
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

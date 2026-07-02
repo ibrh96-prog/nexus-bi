@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { integrations, type IntegrationStatus } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +58,8 @@ function StatusBadge({ status }: { status: IntegrationStatus }) {
 }
 
 function IntegrationsPage() {
-  const loading = useSimulatedLoading(500);
+  const { ready: authReady } = useRequireAuth();
+  const loading = useSimulatedLoading(500) || !authReady;
   const [view, setView] = useState<"grid" | "table">("grid");
   const [enabled, setEnabled] = useState<Record<string, boolean>>(
     Object.fromEntries(integrations.map((i) => [i.name, i.status !== "error"])),

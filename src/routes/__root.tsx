@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppShell } from "../components/app-shell";
+import { useAuthStore } from "../stores/auth-store";
 
 function NotFoundComponent() {
   return (
@@ -145,11 +146,15 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isLanding = pathname === "/";
+  const isShellFree = pathname === "/" || pathname === "/login";
+
+  useEffect(() => {
+    void useAuthStore.getState().hydrate();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {isLanding ? (
+      {isShellFree ? (
         <Outlet />
       ) : (
         <AppShell>

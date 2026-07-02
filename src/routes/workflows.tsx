@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1161,7 +1162,8 @@ function Canvas({
 }
 
 function WorkflowsPage() {
-  const loading = useSimulatedLoading(500);
+  const { ready: authReady } = useRequireAuth();
+  const loading = useSimulatedLoading(500) || !authReady;
   const [nodes, setNodes] = useState<WorkflowNode[]>(initialNodes);
   const [edges, setEdges] = useState<WorkflowEdge[]>(initialEdges);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => new Set(["a1"]));

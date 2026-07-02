@@ -48,13 +48,7 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? "")
   .map((o) => o.trim())
   .filter(Boolean);
 
-export const strictCors: RequestHandler = cors({
-  origin(origin, cb) {
-    // Same-origin / server-to-server (no Origin header) — allow.
-    if (!origin) return cb(null, true);
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    return cb(new Error(`CORS: origin ${origin} is not allowed`));
-  },
+const corsSharedOptions = {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: [
     "Content-Type",
@@ -65,6 +59,23 @@ export const strictCors: RequestHandler = cors({
   ],
   credentials: true,
   maxAge: 86_400,
+};
+
+export const strictCors: RequestHandler = cors((req, callback) => {
+  const origin = req.headers.origin;
+  // No Origin header (server-to-server) — allow. Browsers send an Origin
+  // header even for same-origin requests, so compare hosts rather than
+  // rejecting anything not in ALLOWED_ORIGINS — the frontend and API share
+  // an origin in production, and that's not something operators configure.
+  let allow = !origin;
+  if (origin) {
+    try {
+      allow = new URL(origin).host === req.headers.host || allowedOrigins.includes(origin);
+    } catch {
+      allow = false;
+    }
+  }
+  callback(null, { ...corsSharedOptions, origin: allow });
 });
 
 /**

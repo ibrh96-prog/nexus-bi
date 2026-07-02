@@ -5,7 +5,6 @@ import {
   Plug,
   Sparkles,
   Search,
-  Bell,
   Settings,
   ChevronsLeft,
   Command,
@@ -14,6 +13,16 @@ import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { NotificationsBell } from "@/components/notifications-panel";
+import { useAuthStore } from "@/stores/auth-store";
 
 const nav = [
   { to: "/dashboard", label: "Command Center", icon: LayoutDashboard },
@@ -96,27 +105,63 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-              <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-destructive" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Settings className="h-4 w-4" />
-            </Button>
-            <div className="ml-2 flex items-center gap-2 border-l border-border pl-3">
-              <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-chart-1 to-chart-5 text-xs font-semibold text-primary-foreground">
-                EM
-              </div>
-              <div className="hidden text-xs sm:block">
-                <div className="font-medium leading-tight">Elena Marsh</div>
-                <div className="text-muted-foreground">Ops Director</div>
-              </div>
-            </div>
+            <NotificationsBell />
+            <UserMenu />
           </div>
         </header>
 
         <main className="min-w-0 flex-1">{children}</main>
       </div>
     </div>
+  );
+}
+
+function initialsFromEmail(email: string): string {
+  const local = email.split("@")[0] ?? "";
+  const letters = local.replace(/[^a-zA-Z]/g, "");
+  return (letters.slice(0, 2) || "??").toUpperCase();
+}
+
+function UserMenu() {
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+
+  if (!user) {
+    return (
+      <Button variant="ghost" size="sm" asChild>
+        <Link to="/login">Sign in</Link>
+      </Button>
+    );
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="ml-2 flex items-center gap-2 rounded-md border-l border-border pl-3 outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-chart-1 to-chart-5 text-xs font-semibold text-primary-foreground">
+            {initialsFromEmail(user.email)}
+          </div>
+          <div className="hidden text-left text-xs sm:block">
+            <div className="font-medium leading-tight">{user.email}</div>
+            <div className="capitalize text-muted-foreground">{user.role}</div>
+          </div>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel className="font-normal">
+          <div className="text-xs text-muted-foreground">Signed in as</div>
+          <div className="truncate text-sm font-medium">{user.email}</div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
