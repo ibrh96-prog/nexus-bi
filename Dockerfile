@@ -30,6 +30,7 @@ RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=build-frontend /app/.output ./.output
 COPY --from=build-backend /app/server/dist ./server/dist
+COPY --from=build-backend /app/drizzle ./drizzle
 COPY --from=deps-prod /app/node_modules ./node_modules
 COPY --from=deps-prod /app/package.json ./package.json
 

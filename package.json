@@ -9,6 +9,10 @@
     "build:dev": "vite build --mode development",
     "build:server": "tsc -p server/tsconfig.json",
     "build:all": "npm run build && npm run build:server",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx server/scripts/seed.ts",
+    "predeploy": "npm run db:migrate && npm run db:seed",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
@@ -107,6 +111,7 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "@vitejs/plugin-react": "^5.2.0",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.6",

@@ -7,8 +7,12 @@ initSentry();
 import express, { Request, Response, ErrorRequestHandler } from "express";
 import { createServer } from "http";
 import { ZodError } from "zod";
+import authRouter from "./routes/auth.js";
 import workflowsRouter from "./routes/workflows.js";
 import metricsRouter from "./routes/metrics.js";
+import revenueSeriesRouter from "./routes/revenue-series.js";
+import capacityRouter from "./routes/capacity.js";
+import resourceDistributionRouter from "./routes/resource-distribution.js";
 import insightsRouter from "./routes/insights.js";
 import aiInsightsRouter from "./routes/ai-insights.js";
 import usersRouter from "./routes/users.js";
@@ -31,6 +35,7 @@ import {
 import swaggerUi from "swagger-ui-express";
 import { openApiSpec } from "./openapi.js";
 import { mountFrontend, stopFrontend } from "./frontend.js";
+import { runMigrations } from "./migrate.js";
 
 export const app = express();
 
@@ -70,8 +75,14 @@ app.use(authenticate);
 
 app.get("/health", (_req: Request, res: Response) => res.json({ ok: true }));
 
+// Login has no password to slow brute-forcing — stricter limit.
+app.use("/api/auth/login", strictLimiter);
+app.use("/api/auth", authRouter);
 app.use("/api/workflows", workflowsRouter);
 app.use("/api/metrics", metricsRouter);
+app.use("/api/revenue-series", revenueSeriesRouter);
+app.use("/api/capacity", capacityRouter);
+app.use("/api/resource-distribution", resourceDistributionRouter);
 app.use("/api/insights", insightsRouter);
 app.use("/api/ai/insights", aiInsightsRouter);
 app.use("/api/users", usersRouter);
@@ -106,6 +117,7 @@ export const io = attachCollab(httpServer);
 
 const port = Number(process.env.PORT ?? 3001);
 if (process.env.NODE_ENV !== "test") {
+  await runMigrations();
   httpServer.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`[api] http + socket.io listening on :${port}`);

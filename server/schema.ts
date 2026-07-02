@@ -84,6 +84,59 @@ export const metrics = pgTable(
 );
 
 /* ------------------------------------------------------------------ */
+/* revenue_series — dashboard "Revenue Trajectory" chart               */
+/* ------------------------------------------------------------------ */
+export const revenueSeries = pgTable(
+  "revenue_series",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** Free-text period label, e.g. "2026-01" or "Jan". */
+    period: text("period").notNull(),
+    revenue: numeric("revenue", { precision: 14, scale: 2 }).notNull(),
+    forecast: numeric("forecast", { precision: 14, scale: 2 }).notNull(),
+    automated: numeric("automated", { precision: 14, scale: 2 }).notNull(),
+    recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    periodIdx: index("revenue_series_period_idx").on(t.period),
+  }),
+);
+
+/* ------------------------------------------------------------------ */
+/* capacity_snapshots — dashboard "Capacity" chart, per-team utilization */
+/* ------------------------------------------------------------------ */
+export const capacitySnapshots = pgTable(
+  "capacity_snapshots",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    team: text("team").notNull(),
+    used: integer("used").notNull(), // percentage 0-100
+    capacity: integer("capacity").notNull(), // percentage baseline, usually 100
+    recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    recordedIdx: index("capacity_snapshots_recorded_at_idx").on(t.recordedAt),
+  }),
+);
+
+/* ------------------------------------------------------------------ */
+/* resource_distribution — dashboard "Resource Distribution" chart     */
+/* ------------------------------------------------------------------ */
+export const resourceDistribution = pgTable(
+  "resource_distribution",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** Category name, e.g. "Compute". Color is a frontend presentation concern, not stored here. */
+    name: text("name").notNull(),
+    value: integer("value").notNull(), // percentage share
+    recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    recordedIdx: index("resource_distribution_recorded_at_idx").on(t.recordedAt),
+  }),
+);
+
+/* ------------------------------------------------------------------ */
 /* ai_insights                                                         */
 /* ------------------------------------------------------------------ */
 export const insightTypes = ["anomaly", "recommendation"] as const;
@@ -328,6 +381,12 @@ export type Workflow = typeof workflows.$inferSelect;
 export type NewWorkflow = typeof workflows.$inferInsert;
 export type Metric = typeof metrics.$inferSelect;
 export type NewMetric = typeof metrics.$inferInsert;
+export type RevenueSeriesPoint = typeof revenueSeries.$inferSelect;
+export type NewRevenueSeriesPoint = typeof revenueSeries.$inferInsert;
+export type CapacitySnapshot = typeof capacitySnapshots.$inferSelect;
+export type NewCapacitySnapshot = typeof capacitySnapshots.$inferInsert;
+export type ResourceDistributionEntry = typeof resourceDistribution.$inferSelect;
+export type NewResourceDistributionEntry = typeof resourceDistribution.$inferInsert;
 export type AiInsight = typeof aiInsights.$inferSelect;
 export type NewAiInsight = typeof aiInsights.$inferInsert;
 export type AgentAction = typeof agentActions.$inferSelect;
