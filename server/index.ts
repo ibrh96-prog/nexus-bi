@@ -30,7 +30,7 @@ import {
 } from "./security.js";
 import swaggerUi from "swagger-ui-express";
 import { openApiSpec } from "./openapi.js";
-import { mountFrontend } from "./frontend.js";
+import { mountFrontend, stopFrontend } from "./frontend.js";
 
 export const app = express();
 
@@ -111,4 +111,8 @@ if (process.env.NODE_ENV !== "test") {
     console.log(`[api] http + socket.io listening on :${port}`);
   });
   startAnomalyWatcher();
+
+  // Take the SSR child process down with us instead of orphaning it.
+  process.on("SIGTERM", stopFrontend);
+  process.on("SIGINT", stopFrontend);
 }

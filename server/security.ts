@@ -28,9 +28,12 @@ export const securityHeaders: RequestHandler = helmet({
 /**
  * Helmet for the SSR frontend routes. The API's CSP (`defaultSrc: 'none'`)
  * would block the React app's own scripts/styles, so the document routes
- * get the safe defaults instead of the API's locked-down policy.
+ * get the safe defaults instead. CSP itself is off: TanStack Start injects
+ * inline hydration scripts on every page load, and even helmet's relaxed
+ * default `script-src 'self'` (no `unsafe-inline`) blocks those.
  */
 export const frontendSecurityHeaders: RequestHandler = helmet({
+  contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: "same-site" },
   referrerPolicy: { policy: "no-referrer" },
   hsts: { maxAge: 31_536_000, includeSubDomains: true, preload: true },
