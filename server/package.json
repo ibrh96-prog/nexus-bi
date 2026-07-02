@@ -4,12 +4,9 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
-    "preview": "vite preview",
-    "lint": "eslint .",
-    "format": "prettier --write ."
+  "build": "vite build",
+  "build:server": "tsc -p server/tsconfig.json",
+  "build:all": "npm run build && npm run build:server"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
