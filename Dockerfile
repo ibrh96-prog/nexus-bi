@@ -6,6 +6,11 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --no-audit --no-fund
 
+FROM node:${NODE_VERSION} AS deps-prod
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev --no-audit --no-fund
+
 FROM node:${NODE_VERSION} AS build-frontend
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -26,7 +31,8 @@ RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=build-frontend /app/dist ./public
 COPY --from=build-backend /app/server/dist ./server/dist
-COPY --from=deps /app/package.json ./package.json
+COPY --from=deps-prod /app/node_modules ./node_modules
+COPY --from=deps-prod /app/package.json ./package.json
 
 USER app
 EXPOSE 3001
