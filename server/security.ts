@@ -26,6 +26,17 @@ export const securityHeaders: RequestHandler = helmet({
 });
 
 /**
+ * Helmet for the SSR frontend routes. The API's CSP (`defaultSrc: 'none'`)
+ * would block the React app's own scripts/styles, so the document routes
+ * get the safe defaults instead of the API's locked-down policy.
+ */
+export const frontendSecurityHeaders: RequestHandler = helmet({
+  crossOriginResourcePolicy: { policy: "same-site" },
+  referrerPolicy: { policy: "no-referrer" },
+  hsts: { maxAge: 31_536_000, includeSubDomains: true, preload: true },
+});
+
+/**
  * Strict CORS — only the configured production frontend origin(s) are allowed.
  * Set ALLOWED_ORIGINS as a comma-separated list.
  */

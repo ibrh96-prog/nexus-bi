@@ -22,6 +22,7 @@ import { startAnomalyWatcher } from "./agent/watcher.js";
 import { authenticate } from "./auth.js";
 import {
   securityHeaders,
+  frontendSecurityHeaders,
   strictCors,
   standardLimiter,
   strictLimiter,
@@ -29,6 +30,7 @@ import {
 } from "./security.js";
 import swaggerUi from "swagger-ui-express";
 import { openApiSpec } from "./openapi.js";
+import { mountFrontend } from "./frontend.js";
 
 export const app = express();
 
@@ -48,12 +50,13 @@ app.use(
 // inherits it — including the raw-body webhook routers below.
 app.use(sentryRequestHandler);
 
-// Secure HTTP headers + strict CORS on every response, including preflight.
-app.use(securityHeaders);
-app.use(strictCors);
-
-// Baseline rate limit across the whole API surface.
-app.use(standardLimiter);
+// Secure HTTP headers + strict CORS + rate limiting on the API surface only.
+// The API's locked-down CSP (defaultSrc: 'none') would break the SSR
+// frontend mounted below, and the rate limit budget is far too low for a
+// page's worth of JS/CSS asset requests.
+app.use(["/api", "/health"], securityHeaders);
+app.use(["/api", "/health"], strictCors);
+app.use(["/api", "/health"], standardLimiter);
 
 // Endpoints that need the raw request body (HMAC / Stripe signature checks)
 // MUST be mounted before express.json(). Each uses its own express.raw()
@@ -77,6 +80,13 @@ app.use("/api/integrations", integrationsRouter);
 // Checkout is sensitive — stricter limit than the rest of billing.
 app.use("/api/billing/checkout", strictLimiter);
 app.use("/api/billing", billingRouter);
+
+// Everything else falls through to the SSR frontend. Skipped in tests so
+// they don't spawn the SSR child process as an import side effect.
+app.use(frontendSecurityHeaders);
+if (process.env.NODE_ENV !== "test") {
+  mountFrontend(app);
+}
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {

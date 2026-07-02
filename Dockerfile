@@ -15,8 +15,7 @@ FROM node:${NODE_VERSION} AS build-frontend
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build && \
-    ( [ -d "build" ] && mv build dist || [ -d "out" ] && mv out dist || mkdir -p dist )
+RUN npm run build
 
 FROM node:${NODE_VERSION} AS build-backend
 WORKDIR /app
@@ -29,7 +28,7 @@ WORKDIR /app
 ENV NODE_ENV=production PORT=3001
 RUN addgroup -S app && adduser -S app -G app
 
-COPY --from=build-frontend /app/dist ./public
+COPY --from=build-frontend /app/.output ./.output
 COPY --from=build-backend /app/server/dist ./server/dist
 COPY --from=deps-prod /app/node_modules ./node_modules
 COPY --from=deps-prod /app/package.json ./package.json

@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // We deploy as a single Node process (Express server mounts the SSR handler
+  // itself) rather than Cloudflare Workers, so override the default preset.
+  nitro: {
+    preset: "node-server",
+  },
 });
