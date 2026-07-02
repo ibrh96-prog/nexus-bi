@@ -1,9 +1,9 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { desc } from "drizzle-orm";
-import { db } from "../db";
-import { auditLogs } from "../schema";
-import { requireAdmin } from "../auth";
-import { verifyAuditChain } from "../audit";
+import { db } from "../db.js";
+import { auditLogs } from "../schema.js";
+import { requireAdmin } from "../auth.js";
+import { verifyAuditChain } from "../audit.js";
 
 const router = Router();
 

@@ -6,7 +6,7 @@
  * unchanged — the app just falls through to the DB every time.
  */
 import { createClient, type RedisClientType } from "redis";
-import { reportServerError } from "./observability";
+import { reportServerError } from "./observability.js";
 
 const REDIS_URL = process.env.REDIS_URL;
 const KEY_PREFIX = process.env.REDIS_KEY_PREFIX ?? "bi:";

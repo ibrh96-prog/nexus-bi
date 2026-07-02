@@ -1,34 +1,34 @@
 // Sentry MUST be initialized before any other module that creates HTTP
 // clients, DB pools, or the express app — so its auto-instrumentation can
 // patch them at require time.
-import { initSentry, sentryRequestHandler, sentryErrorHandler } from "./observability";
+import { initSentry, sentryRequestHandler, sentryErrorHandler } from "./observability.js";
 initSentry();
 
 import express, { Request, Response, ErrorRequestHandler } from "express";
 import { createServer } from "http";
 import { ZodError } from "zod";
-import workflowsRouter from "./routes/workflows";
-import metricsRouter from "./routes/metrics";
-import insightsRouter from "./routes/insights";
-import aiInsightsRouter from "./routes/ai-insights";
-import usersRouter from "./routes/users";
-import auditLogsRouter from "./routes/audit-logs";
-import integrationsRouter from "./routes/integrations";
-import webhooksRouter from "./routes/webhooks";
-import billingRouter from "./routes/billing";
-import billingWebhookRouter from "./routes/billing-webhook";
-import { attachCollab } from "./collab";
-import { startAnomalyWatcher } from "./agent/watcher";
-import { authenticate } from "./auth";
+import workflowsRouter from "./routes/workflows.js";
+import metricsRouter from "./routes/metrics.js";
+import insightsRouter from "./routes/insights.js";
+import aiInsightsRouter from "./routes/ai-insights.js";
+import usersRouter from "./routes/users.js";
+import auditLogsRouter from "./routes/audit-logs.js";
+import integrationsRouter from "./routes/integrations.js";
+import webhooksRouter from "./routes/webhooks.js";
+import billingRouter from "./routes/billing.js";
+import billingWebhookRouter from "./routes/billing-webhook.js";
+import { attachCollab } from "./collab.js";
+import { startAnomalyWatcher } from "./agent/watcher.js";
+import { authenticate } from "./auth.js";
 import {
   securityHeaders,
   strictCors,
   standardLimiter,
   strictLimiter,
   sanitizeInputs,
-} from "./security";
+} from "./security.js";
 import swaggerUi from "swagger-ui-express";
-import { openApiSpec } from "./openapi";
+import { openApiSpec } from "./openapi.js";
 
 export const app = express();
 

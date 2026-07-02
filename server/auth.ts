@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { eq } from "drizzle-orm";
-import { db } from "./db";
-import { users, type UserRole } from "./schema";
+import { db } from "./db.js";
+import { users, type UserRole } from "./schema.js";
 
 export type AuthenticatedUser = { id: string; email: string; role: UserRole };
 

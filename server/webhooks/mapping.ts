@@ -1,4 +1,4 @@
-import type { MappingRule, WorkflowNode } from "../schema";
+import type { MappingRule, WorkflowNode } from "../schema.js";
 
 /**
  * Resolve a dot/bracket path like `data.object.amount` or `items[0].sku`

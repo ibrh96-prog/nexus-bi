@@ -1,12 +1,12 @@
 import { Router, type Request, type Response } from "express";
 import express from "express";
 import type Stripe from "stripe";
-import { stripe } from "../billing/stripe";
+import { stripe } from "../billing/stripe.js";
 import {
   isDuplicateEvent,
   upsertSubscriptionFromStripe,
   userIdForStripeCustomer,
-} from "../billing/service";
+} from "../billing/service.js";
 
 /**
  * Stripe -> our server. MUST be mounted before express.json() so signature
@@ -51,10 +51,14 @@ router.post("/", webhookRawParser, async (req: Request, res: Response) => {
 
       case "invoice.payment_succeeded": {
         const invoice = event.data.object as Stripe.Invoice;
-        if (!invoice.subscription || typeof invoice.customer !== "string") break;
+        // Stripe moved the subscription reference under parent.subscription_details as of API 2025+.
+        const subscriptionRef = invoice.parent?.subscription_details?.subscription;
+        if (!subscriptionRef || typeof invoice.customer !== "string") break;
         const userId = await userIdForStripeCustomer(invoice.customer);
         if (!userId) break;
-        const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+        const subscriptionId =
+          typeof subscriptionRef === "string" ? subscriptionRef : subscriptionRef.id;
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         await upsertSubscriptionFromStripe(userId, subscription);
         break;
       }

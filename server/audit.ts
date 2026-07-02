@@ -1,8 +1,8 @@
 import { createHash } from "crypto";
 import { desc, eq } from "drizzle-orm";
 import type { Request } from "express";
-import { db } from "./db";
-import { auditLogs, type NewAuditLog } from "./schema";
+import { db } from "./db.js";
+import { auditLogs, type NewAuditLog } from "./schema.js";
 
 const GENESIS_HASH = "0".repeat(64);
 

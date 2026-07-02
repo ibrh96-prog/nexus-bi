@@ -1,9 +1,9 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import type Stripe from "stripe";
-import { requireAnyRole } from "../auth";
-import { stripe } from "../billing/stripe";
-import { ensureStripeCustomer } from "../billing/service";
+import { requireAnyRole } from "../auth.js";
+import { stripe } from "../billing/stripe.js";
+import { ensureStripeCustomer } from "../billing/service.js";
 
 const router = Router();
 

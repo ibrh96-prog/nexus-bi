@@ -1,10 +1,10 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "../db";
-import { workflows } from "../schema";
-import { requireAnyRole, requireEditor } from "../auth";
-import { auditFromRequest } from "../audit";
+import { db } from "../db.js";
+import { workflows } from "../schema.js";
+import { requireAnyRole, requireEditor } from "../auth.js";
+import { auditFromRequest } from "../audit.js";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ const nodeSchema = z.object({
   id: z.string().min(1),
   type: z.string().min(1),
   position: z.object({ x: z.number(), y: z.number() }),
-  data: z.record(z.unknown()).optional(),
+  data: z.record(z.string(), z.unknown()).optional(),
 });
 
 const edgeSchema = z.object({

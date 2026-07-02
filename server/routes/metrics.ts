@@ -1,12 +1,12 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "../db";
-import { metrics } from "../schema";
-import { requireAnyRole, requireEditor } from "../auth";
-import { auditFromRequest } from "../audit";
-import { cacheMetrics } from "../cache-middleware";
-import { cacheInvalidatePrefix, METRICS_CACHE_PREFIX } from "../cache";
+import { db } from "../db.js";
+import { metrics } from "../schema.js";
+import { requireAnyRole, requireEditor } from "../auth.js";
+import { auditFromRequest } from "../audit.js";
+import { cacheMetrics } from "../cache-middleware.js";
+import { cacheInvalidatePrefix, METRICS_CACHE_PREFIX } from "../cache.js";
 
 const router = Router();
 

@@ -1,8 +1,8 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { eq, sql } from "drizzle-orm";
-import { db } from "../db";
-import { agentActions, workflows, type NewAgentAction } from "../schema";
+import { db } from "../db.js";
+import { agentActions, workflows, type NewAgentAction } from "../schema.js";
 
 /**
  * Persist an audit-log entry for every tool invocation the autonomous

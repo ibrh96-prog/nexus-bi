@@ -1,8 +1,8 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { createAgent } from "langchain";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { buildToolset, logAgentAction } from "./tools";
-import type { AiInsight } from "../schema";
+import { buildToolset, logAgentAction } from "./tools.js";
+import type { AiInsight } from "../schema.js";
 
 const SYSTEM_PROMPT = `You are the Autonomous Operations Agent for an enterprise BI platform.
 You receive an anomaly detected in production metrics and must decide which
@@ -52,7 +52,7 @@ export async function runAgentForInsight(insight: AiInsight): Promise<AgentRunRe
       messages: [new SystemMessage(SYSTEM_PROMPT), new HumanMessage(humanContent)],
     });
 
-    const messages = (result as { messages: Array<Record<string, unknown>> }).messages ?? [];
+    const messages = result.messages ?? [];
     const finalMessage =
       typeof messages.at(-1)?.content === "string"
         ? (messages.at(-1)!.content as string)

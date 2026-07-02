@@ -1,10 +1,10 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "../db";
-import { users, userRoles } from "../schema";
-import { requireAdmin } from "../auth";
-import { auditFromRequest } from "../audit";
+import { db } from "../db.js";
+import { users, userRoles } from "../schema.js";
+import { requireAdmin } from "../auth.js";
+import { auditFromRequest } from "../audit.js";
 
 const router = Router();
 

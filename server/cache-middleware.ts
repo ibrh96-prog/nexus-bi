@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { METRICS_CACHE_PREFIX, METRICS_TTL_SECONDS, cacheGetJson, cacheSetJson } from "./cache";
+import { METRICS_CACHE_PREFIX, METRICS_TTL_SECONDS, cacheGetJson, cacheSetJson } from "./cache.js";
 
 /**
  * Build a cache key that varies by the querystring shape the /metrics

@@ -1,12 +1,13 @@
 import { Router, type Request, type Response } from "express";
 import express from "express";
 import { and, eq } from "drizzle-orm";
-import { db } from "../db";
-import { integrations, workflows, workflowRuns } from "../schema";
-import { verifySignature } from "../webhooks/signature";
-import { applyMapping, injectIntoStartNode } from "../webhooks/mapping";
-import { checkRateLimit } from "../webhooks/rate-limit";
-import { invalidateDashboardCaches } from "../cache";
+import { z } from "zod";
+import { db } from "../db.js";
+import { integrations, workflows, workflowRuns } from "../schema.js";
+import { verifySignature } from "../webhooks/signature.js";
+import { applyMapping, injectIntoStartNode } from "../webhooks/mapping.js";
+import { checkRateLimit } from "../webhooks/rate-limit.js";
+import { invalidateDashboardCaches } from "../cache.js";
 
 const router = Router();
 
@@ -29,8 +30,13 @@ const rawJson = express.raw({
  *   2. rate limit (per integrationSecret + source IP)
  *   3. HMAC signature verification per integration.signatureScheme
  */
+const paramsSchema = z.object({
+  workflowId: z.string(),
+  integrationSecret: z.string(),
+});
+
 router.post("/:workflowId/:integrationSecret", rawJson, async (req: Request, res: Response) => {
-  const { workflowId, integrationSecret } = req.params;
+  const { workflowId, integrationSecret } = paramsSchema.parse(req.params);
   const sourceIp =
     (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ??
     req.ip ??

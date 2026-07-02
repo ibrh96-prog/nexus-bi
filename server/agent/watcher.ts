@@ -1,8 +1,8 @@
 import cron from "node-cron";
 import { and, eq, inArray, desc } from "drizzle-orm";
-import { db } from "../db";
-import { aiInsights, type AiInsight } from "../schema";
-import { runAgentForInsight } from "./agent";
+import { db } from "../db.js";
+import { aiInsights, type AiInsight } from "../schema.js";
+import { runAgentForInsight } from "./agent.js";
 
 const CRITICAL_SEVERITIES = ["high", "critical"] as const;
 const POLL_CRON = process.env.AGENT_WATCHER_CRON ?? "*/1 * * * *"; // every minute
@@ -17,7 +17,7 @@ async function processPendingAnomalies(): Promise<void> {
       and(
         eq(aiInsights.type, "anomaly"),
         eq(aiInsights.status, "pending"),
-        inArray(aiInsights.severity, CRITICAL_SEVERITIES as unknown as string[]),
+        inArray(aiInsights.severity, CRITICAL_SEVERITIES),
       ),
     )
     .orderBy(desc(aiInsights.createdAt))

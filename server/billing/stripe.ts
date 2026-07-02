@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import type { SubscriptionTier } from "./schema";
+import type { SubscriptionTier } from "../schema.js";
 
 const key = process.env.STRIPE_SECRET_KEY;
 if (!key && process.env.NODE_ENV !== "test") {
@@ -8,7 +8,7 @@ if (!key && process.env.NODE_ENV !== "test") {
 }
 
 export const stripe = new Stripe(key ?? "sk_test_placeholder", {
-  apiVersion: "2024-06-20",
+  apiVersion: "2026-06-24.dahlia",
   typescript: true,
   maxNetworkRetries: 2,
 });

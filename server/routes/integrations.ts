@@ -2,10 +2,10 @@ import { Router, type Request, type Response } from "express";
 import { randomBytes } from "crypto";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "../db";
-import { integrations, signatureSchemes } from "../schema";
-import { requireAnyRole, requireEditor } from "../auth";
-import { auditFromRequest } from "../audit";
+import { db } from "../db.js";
+import { integrations, signatureSchemes } from "../schema.js";
+import { requireAnyRole, requireEditor } from "../auth.js";
+import { auditFromRequest } from "../audit.js";
 
 const router = Router();
 

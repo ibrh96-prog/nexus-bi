@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import * as schema from "./schema";
+import * as schema from "./schema.js";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -18,7 +18,7 @@ pool.on("error", (err) => {
   // eslint-disable-next-line no-console
   console.error("[pg] unexpected pool error", err);
   // Report DB connection failures to Sentry — these never flow through Express.
-  import("./observability").then(({ reportServerError }) =>
+  import("./observability.js").then(({ reportServerError }) =>
     reportServerError(err, { subsystem: "pg-pool" }),
   );
 });

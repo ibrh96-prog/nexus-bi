@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { randomUUID } from "crypto";
-import { db } from "../db";
+import { db } from "../db.js";
 import {
   billingCustomers,
   stripeEvents,
@@ -9,8 +9,8 @@ import {
   users,
   type SubscriptionStatus,
   type SubscriptionTier,
-} from "../schema";
-import { PRICE_TO_TIER, METERED_AI_TOKENS_PRICE_ID, stripe } from "./stripe";
+} from "../schema.js";
+import { PRICE_TO_TIER, METERED_AI_TOKENS_PRICE_ID, stripe } from "./stripe.js";
 
 /**
  * Get or create a Stripe customer for a user. Idempotent.
@@ -81,6 +81,8 @@ export async function upsertSubscriptionFromStripe(
 ): Promise<void> {
   const { tier, priceId, meteredItemId } = classifySubscription(subscription);
   const status = subscription.status as SubscriptionStatus;
+  // Stripe moved billing-period fields from the subscription to its items as of API 2025+.
+  const currentPeriodEndSec = subscription.items.data[0]?.current_period_end;
 
   await db
     .update(billingCustomers)
@@ -90,7 +92,7 @@ export async function upsertSubscriptionFromStripe(
       stripeMeteredItemId: meteredItemId,
       tier,
       status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd: currentPeriodEndSec ? new Date(currentPeriodEndSec * 1000) : null,
       updatedAt: new Date(),
     })
     .where(eq(billingCustomers.userId, userId));
@@ -153,12 +155,18 @@ export async function reportAiTokenUsage(params: {
     })
     .returning();
 
-  await stripe.subscriptionItems.createUsageRecord(
-    billing.stripeMeteredItemId,
+  // Stripe removed the old Usage Records API; usage is now reported as meter
+  // events keyed by customer, not by subscription item. Configure a Billing
+  // Meter in the Stripe dashboard and set its event name via env.
+  await stripe.billing.meterEvents.create(
     {
-      quantity: tokens,
+      event_name: process.env.STRIPE_AI_TOKENS_METER_EVENT_NAME ?? "ai_tokens",
+      payload: {
+        stripe_customer_id: billing.stripeCustomerId,
+        value: String(tokens),
+      },
       timestamp: params.timestamp ?? Math.floor(Date.now() / 1000),
-      action: "increment",
+      identifier: idempotencyKey,
     },
     { idempotencyKey },
   );

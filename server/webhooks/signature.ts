@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
-import type { SignatureScheme } from "../schema";
+import type { SignatureScheme } from "../schema.js";
 
 /** Constant-time hex compare — never leaks timing info. */
 function safeHexEqual(a: string, b: string): boolean {

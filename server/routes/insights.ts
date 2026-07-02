@@ -1,8 +1,8 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "../db";
-import { aiInsights, insightStatuses, insightTypes } from "../schema";
+import { db } from "../db.js";
+import { aiInsights, insightStatuses, insightTypes } from "../schema.js";
 
 const router = Router();
 
